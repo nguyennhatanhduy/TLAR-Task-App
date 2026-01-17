@@ -1,18 +1,17 @@
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Dimensions,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
+import { useRouter } from "expo-router";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -20,102 +19,130 @@ const Login = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = () => {
+  const handleLoginPress = () => {
     if (!username || !password) {
-      setError("vui lòng nhập tài khoảng và mật khẩu");
+      setError("Vui lòng nhập tài khoản và mật khẩu");
     } else {
       setError("");
-      router.push("/(tabs)/tab1");
+      router.push("/tab1");
     }
+  };
+
+  const handleRegisterPress = () => {
+    console.log("Register button pressed");
   };
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.keyboardAvoidingContainer}
     >
-      <Image
-        source={require("../assets/images/logo.png")}
-        style={styles.logo}
-      />
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.registerButton]}
-          onPress={() => {}}
-        >
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Image
+            source={require("../assets/images/logo.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            value={username}
+            onChangeText={(text) => {
+              setUsername(text);
+              if (error) setError("");
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (error) setError("");
+            }}
+          />
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.registerButton]}
+              onPress={handleRegisterPress}
+            >
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: screenWidth * 0.05,
-    backgroundColor: "white",
+    padding: 20,
+    backgroundColor: "#ffffff",
   },
   logo: {
-    width: screenWidth * 0.3,
-    height: screenWidth * 0.3,
-    marginBottom: screenHeight * 0.05,
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   },
   title: {
-    fontSize: screenWidth * 0.08,
-    marginBottom: screenHeight * 0.03,
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
   },
   input: {
     width: "100%",
-    height: screenHeight * 0.06,
-    borderColor: "gray",
+    height: 50,
+    backgroundColor: "white",
+    borderColor: "#ddd",
     borderWidth: 1,
-    marginBottom: screenHeight * 0.015,
-    paddingHorizontal: screenWidth * 0.04,
-    borderRadius: 5,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: screenHeight * 0.015,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    borderRadius: 10,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginTop: 10,
   },
   button: {
     backgroundColor: "#007BFF",
-    padding: screenHeight * 0.015,
-    borderRadius: 5,
+    paddingVertical: 15,
+    borderRadius: 10,
     alignItems: "center",
     width: "48%",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   registerButton: {
-    backgroundColor: "gray",
+    backgroundColor: "#6c757d",
   },
   buttonText: {
     color: "white",
-    fontSize: screenWidth * 0.04,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+    alignSelf: "flex-start",
   },
 });
 
