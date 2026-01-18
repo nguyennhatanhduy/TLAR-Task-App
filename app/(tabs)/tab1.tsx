@@ -1,8 +1,10 @@
-import React, { useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import { Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import CardScanTask from "../Components/CardScanTask";
 import HeaderHome from "../Components/HeaderHome";
 import PowerButton from "../Components/PowerButton";
+import SectorSelection from "../Components/SectorSelection";
 import TaskCard from "../Components/TaskCard";
 
 const Tab1 = () => {
@@ -12,6 +14,13 @@ const Tab1 = () => {
   const [isOnline, setIsOnline] = useState(false);
   // Ref để lưu timer debounce
   const timeoutRef = useRef<any>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    }, []),
+  );
 
   const handleScroll = () => {
     // 1. Khi đang cuộn -> Slide xuống (Ẩn)
@@ -44,11 +53,14 @@ const Tab1 = () => {
         <CardScanTask isOnline={isOnline} />
       </View>
       <ScrollView
+        ref={scrollViewRef}
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         onScroll={handleScroll} // Bắt sự kiện cuộn
         scrollEventThrottle={16} // Đảm bảo sự kiện bắn ra mượt mà (16ms ~ 60fps)
       >
+        <SectorSelection />
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Lịch sử</Text>
         </View>
@@ -105,7 +117,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     alignSelf: "center",
-    zIndex: 999, // Đảm bảo nằm trên cùng
+    zIndex: 10, // Giảm zIndex để không đè lên dropdown của SectorSelection
   },
   sectionHeader: {
     width: "100%",
