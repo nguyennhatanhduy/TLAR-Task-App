@@ -1,17 +1,17 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  KeyboardAvoidingView,
-  Platform,
   TouchableWithoutFeedback,
-  Keyboard,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -19,12 +19,31 @@ const Login = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLoginPress = () => {
-    if (!username || !password) {
-      setError("Vui lòng nhập tài khoản và mật khẩu");
-    } else {
-      setError("");
+  const handleLoginPress = async () => {
+    try {
+      const response = await fetch("http://192.168.1.11:8000/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      });
+
+      if (!response.ok) {
+        setError("Invalid username or password");
+        return;
+      }
+
+      const token = await response.json();
+      console.log("Token received:", token);
       router.push("/tab1");
+      // router.replace("/(tabs)"); // Chuyển hướng sau khi login thành công
+    } catch (err) {
+      console.error(err);
+      setError("Connection failed");
     }
   };
 
